@@ -38,20 +38,45 @@
   const list = $('#work-list');
   function renderWork() {
     if (!list) return;
-    list.innerHTML = PROJECTS.map(p => `
-      <a class="proj" href="project.html?slug=${p.slug}" style="--accent:${p.accent};--tab-ink:${inkOn(p.accent)}">
-        <div class="folder">
-          <span class="tab">${pick(p.category)}</span>
-          <div class="sheet"><img src="${p.cover}" alt="" loading="lazy"></div>
-        </div>
-        <div>
-          <h3>${pick(p.title)}</h3>
-          <p class="meta">${pick(p.role)}, ${yearOf(p)}</p>
-          <p class="sum">${pick(p.summary)}</p>
-          <span class="open">${lang === 'es' ? 'Ver el proyecto' : 'See the project'}</span>
-        </div>
-      </a>`).join('');
+    const n = PROJECTS.length;
+    list.innerHTML = PROJECTS.map((p, i) => {
+      const papers = [p.cover, ...(p.gallery || []).filter(g => g !== p.cover)].slice(0, 3);
+      return `
+      <a class="folder" href="project.html?slug=${p.slug}" style="--accent:${p.accent};--f-ink:${inkOn(p.accent)};--tabx:${(i / n * 100).toFixed(2)}%">
+        <span class="f-tab">${pick(p.title)}<em>${yearOf(p)}</em></span>
+        <span class="f-body">
+          <span class="f-papers">
+            ${papers.slice(1).reverse().map((src, k) => `<img class="p${papers.length - k}" src="${src}" alt="" loading="lazy">`).join('')}
+            <img class="p1" src="${papers[0]}" alt="" loading="lazy">
+            <span class="f-pocket"><span class="f-label">${pick(p.category)}</span></span>
+          </span>
+          <span class="f-text">
+            <h3>${pick(p.title)}</h3>
+            <span class="meta">${pick(p.role)}</span>
+            <span class="sum">${pick(p.summary)}</span>
+            <span class="f-open">${lang === 'es' ? 'Abrir la carpeta' : 'Open the folder'}</span>
+          </span>
+        </span>
+      </a>`;
+    }).join('');
+    stack();
   }
+
+  // folders that get covered sink back a little, like a drawer filling up
+  function stack() {
+    if (!list || reduce) return;
+    const fs = $$('.folder', list);
+    fs.forEach((f, i) => {
+      const next = fs[i + 1];
+      if (!next) { f.style.transform = ''; f.style.filter = ''; return; }
+      const top = parseFloat(getComputedStyle(f).top) || 0;
+      const h = f.offsetHeight;
+      const k = Math.max(0, Math.min(1, 1 - (next.getBoundingClientRect().top - top) / h));
+      f.style.transform = k ? `scale(${1 - k * .05})` : '';
+      f.style.filter = k ? `brightness(${1 - k * .22})` : '';
+    });
+  }
+  if (list) addEventListener('scroll', () => requestAnimationFrame(stack), { passive: true });
 
   /* ── project page ── */
   const pd = $('#pd');
