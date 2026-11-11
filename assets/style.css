@@ -110,7 +110,7 @@ button { font: inherit; color: inherit; }
 @media (prefers-reduced-motion: reduce) { .sticker svg { animation: none; } }
 .bizcard { width: 260px; height: 150px; padding: 18px 20px; background: #fff; border-radius: 6px; display: flex; flex-direction: column; justify-content: space-between; }
 .bizcard b { font-family: var(--display); font-size: 22px; font-weight: 700; line-height: 1; }
-.bizcard span { font-size: 13px; color: var(--graphite); }
+.bizcard span { font-size: 13px; color: var(--graphite); line-height: 1.5; }
 
 .hint { margin: 0 0 14px; color: rgba(255,255,255,.78); font-family: var(--hand); font-size: 26px; transform: rotate(-2deg); transform-origin: left; transition: opacity .6s; }
 .desk.touched .hint { opacity: 0; }
@@ -135,9 +135,19 @@ section { padding-block: clamp(72px, 10vw, 140px); }
 .f-tab em { font-style: normal; font-family: var(--text); font-weight: 400; font-size: 13px; opacity: .8; }
 .f-back {
   position: relative; display: block; height: clamp(520px, 72vh, 660px);
-  background: #F1F1EF; border-radius: 22px; border-top: 4px solid var(--accent); overflow: hidden;
+  background: #F1F1EF; border-radius: 22px; overflow: hidden;
   box-shadow: 0 -10px 30px rgba(0,0,0,.06);
 }
+.f-back::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 4px; background: var(--accent); z-index: 1; }
+.folder.at-edge .f-back { border-top-left-radius: 0; }
+/* the curve where the tab meets the folder edge */
+.f-tab::before, .f-tab::after {
+  content: ''; position: absolute; bottom: 0; width: 14px; height: 14px; pointer-events: none;
+  background: radial-gradient(circle at var(--cx) 0, transparent 13.5px, var(--accent) 14px);
+}
+.f-tab::before { left: -14px; --cx: 0; }
+.f-tab::after { right: -14px; --cx: 100%; }
+.folder.at-edge .f-tab::before { display: none; }
 .folder:first-child .f-back { box-shadow: none; }
 .f-sheet {
   position: absolute; left: 7%; right: 7%; top: 6%; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; background: #fff;
@@ -182,10 +192,11 @@ section { padding-block: clamp(72px, 10vw, 140px); }
   position: relative; background: var(--postit); border-radius: 4px 4px 40px 4px; padding: clamp(28px, 5vw, 72px);
   transform: rotate(-1.2deg); box-shadow: 0 2px 2px rgba(0,0,0,.08), 0 24px 50px rgba(0,0,0,.12);
 }
-.note h2 { margin: 0; font-family: var(--hand); font-weight: 600; font-size: clamp(56px, 9vw, 140px); line-height: .85; }
-.note p { margin: 20px 0 0; max-width: 46ch; }
-.mail { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 28px; }
-.mail a { font-family: var(--display); font-weight: 700; font-size: clamp(22px, 3.4vw, 44px); letter-spacing: -.02em; text-decoration-thickness: 3px; text-underline-offset: 6px; overflow-wrap: anywhere; }
+.note { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 5vw, 80px); align-items: end; }
+.note h2 { margin: 0; font-family: var(--hand); font-weight: 600; font-size: clamp(64px, 10vw, 160px); line-height: .8; }
+.note p { margin: 0; max-width: 42ch; font-size: 18px; }
+.mail { display: flex; flex-wrap: wrap; align-items: center; gap: 14px; margin-top: 22px; }
+.mail a { font-family: var(--display); font-weight: 600; font-size: clamp(22px, 2.6vw, 36px); letter-spacing: -.02em; text-decoration-thickness: 3px; text-underline-offset: 6px; overflow-wrap: anywhere; }
 .copy { border: 2px solid var(--ink); background: transparent; border-radius: 999px; padding: 8px 16px; font-weight: 600; font-size: 14px; cursor: pointer; }
 .copy:hover { background: var(--ink); color: var(--postit); }
 .foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-block: 36px 40px; color: var(--graphite); font-size: 14px; }
@@ -260,7 +271,10 @@ section { padding-block: clamp(72px, 10vw, 140px); }
   .numbers { grid-template-columns: 1fr; }
   .facts div { grid-template-columns: 1fr; gap: 2px; }
   .pd-meta { grid-template-columns: 1fr; }
-  .note { transform: none; }
+  .note { transform: none; grid-template-columns: 1fr; }
 }
 .blk-wide.tall img { width: min(100%, 900px); margin-left: auto; }
 .gallery:has(> img:only-child) { columns: 1; max-width: 760px; }
+h1, h2, h3 { text-wrap: balance; }
+p { text-wrap: pretty; }
+@media (max-width: 640px) { .contact { padding-top: 40px; } }

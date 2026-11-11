@@ -12,7 +12,7 @@
   const inkOn = hex => { const n = parseInt(hex.slice(1), 16); const l = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)); return l > 150 ? '#000' : '#fff'; };
 
   /* ── language ── */
-  const RING = { en: 'available for good projects ✳ available for good projects ✳', es: 'disponible para buenos proyectos ✳ disponible para buenos proyectos ✳' };
+  const RING = { en: 'available for good projects ✳ ', es: 'disponible para buenos proyectos ✳ ' };
   let rerender = () => {};
   function applyLang() {
     document.documentElement.lang = lang;
@@ -40,7 +40,7 @@
     if (!list) return;
     const n = PROJECTS.length;
     list.innerHTML = PROJECTS.map((p, i) => `
-      <a class="folder" href="project.html?slug=${p.slug}" style="--accent:${p.accent};--f-ink:${inkOn(p.accent)};--tabx:${(i / n * 100).toFixed(2)}%">
+      <a class="folder${i === 0 ? ' at-edge' : ''}" href="project.html?slug=${p.slug}" style="--accent:${p.accent};--f-ink:${inkOn(p.accent)};--tabx:${(i / n * 100).toFixed(2)}%">
         <span class="f-tab">${pick(p.title)}<em>${yearOf(p)}</em></span>
         <span class="f-back">
           <span class="f-sheet"><img src="${p.cover}" alt="" loading="lazy"></span>
