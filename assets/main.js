@@ -1,258 +1,201 @@
-let currentLang = 'en';
+/* Laureano Lojo — portfolio
+   The desk: real objects on a cutting mat you can pick up, toss and open. */
+(() => {
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let lang = 'en';
+  try { const saved = localStorage.getItem('lang'); if (saved === 'es' || saved === 'en') lang = saved; } catch (e) {}
 
-function pick(field, lang) {
-  lang = lang || currentLang;
-  if (field == null) return '';
-  if (typeof field === 'string') return field;
-  return field[lang] || field.en || '';
-}
+  const pick = f => (f == null ? '' : typeof f === 'string' ? f : (f[lang] || f.en || ''));
+  const yearOf = p => (lang === 'es' ? (p.yearEs || p.year) : p.year);
+  const inkOn = hex => { const n = parseInt(hex.slice(1), 16); const l = (0.299 * (n >> 16) + 0.587 * ((n >> 8) & 255) + 0.114 * (n & 255)); return l > 150 ? '#000' : '#fff'; };
 
-/* ---------------- language toggle ---------------- */
-function applyStaticLang(lang) {
-  document.documentElement.lang = lang;
-  document.querySelectorAll('[data-en]').forEach(el => {
-    const val = lang === 'es' ? el.dataset.es : el.dataset.en;
-    if (val != null) el.textContent = val;
-  });
-  document.querySelectorAll('.langtoggle button').forEach(b => {
-    b.classList.toggle('active', b.dataset.lang === lang);
-  });
-}
+  /* ── language ── */
+  const RING = { en: 'available for good projects ✳ available for good projects ✳', es: 'disponible para buenos proyectos ✳ disponible para buenos proyectos ✳' };
+  let rerender = () => {};
+  function applyLang() {
+    document.documentElement.lang = lang;
+    $$('[data-en]').forEach(el => { const v = el.dataset[lang]; if (v != null) el.textContent = v; });
+    $$('[data-en-label]').forEach(el => el.setAttribute('aria-label', el.dataset[lang + 'Label'] || el.dataset.enLabel));
+    $$('.ring-text').forEach(el => { el.textContent = RING[lang]; });
+    $$('.lang button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+    rerender();
+  }
+  $$('.lang button').forEach(b => b.addEventListener('click', () => {
+    lang = b.dataset.lang; try { localStorage.setItem('lang', lang); } catch (e) {}
+    applyLang();
+  }));
 
-function setLang(lang) {
-  currentLang = lang;
-  applyStaticLang(lang);
-  if (window.__rerender) window.__rerender();
-}
+  /* ── copy email ── */
+  $$('[data-copy]').forEach(btn => btn.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(btn.dataset.copy); } catch (e) { location.href = 'mailto:' + btn.dataset.copy; return; }
+    btn.textContent = lang === 'es' ? 'Copiado' : 'Copied';
+    setTimeout(() => { btn.textContent = btn.dataset[lang]; }, 1800);
+  }));
 
-function initLangToggle() {
-  document.querySelectorAll('.langtoggle button').forEach(b => {
-    b.addEventListener('click', () => setLang(b.dataset.lang));
-  });
-  applyStaticLang(currentLang);
-}
-
-/* ---------------- custom cursor ---------------- */
-function initCursor() {
-  const isTouch = window.matchMedia('(hover: none)').matches;
-  if (isTouch) { document.body.classList.add('touch'); return; }
-
-  const cursor = document.createElement('div');
-  cursor.id = 'cursor';
-  document.body.appendChild(cursor);
-
-  window.addEventListener('mousemove', e => {
-    cursor.style.left = e.clientX + 'px';
-    cursor.style.top = e.clientY + 'px';
-  });
-
-  document.addEventListener('mouseover', e => {
-    if (e.target.closest('.pcard')) cursor.classList.add('big');
-  });
-  document.addEventListener('mouseout', e => {
-    if (e.target.closest('.pcard')) cursor.classList.remove('big');
-  });
-}
-
-/* ---------------- hero rotating word ---------------- */
-const ROTATE_WORDS = {
-  en: ['brand systems', 'products', 'content'],
-  es: ['sistemas de marca', 'productos', 'contenido']
-};
-function initRotator() {
-  const el = document.getElementById('rotateWord');
-  if (!el) return;
-  let i = 0;
-  setInterval(() => {
-    i = (i + 1) % 3;
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(10px)';
-    setTimeout(() => {
-      el.textContent = ROTATE_WORDS[currentLang][i];
-      el.style.transform = 'translateY(-10px)';
-      requestAnimationFrame(() => {
-        el.style.opacity = '1';
-        el.style.transform = 'translateY(0)';
-      });
-    }, 220);
-  }, 2400);
-  window.__rotateIndex = () => i;
-}
-function syncRotatorLang() {
-  const el = document.getElementById('rotateWord');
-  if (!el || !window.__rotateIndex) return;
-  el.textContent = ROTATE_WORDS[currentLang][window.__rotateIndex()];
-}
-
-/* ---------------- project card markup ---------------- */
-function fallbackStyle(accent) {
-  return `background:linear-gradient(135deg, ${accent}, #0e0e0c);`;
-}
-
-function projectCardHTML(p, size) {
-  const title = pick(p.title);
-  const category = pick(p.category);
-  const year = currentLang === 'es' ? (p.yearEs || p.year) : p.year;
-  const sizeClass = size ? ` ${size}` : '';
-  return `
-    <a class="pcard${sizeClass}" href="project.html?slug=${p.slug}" data-filter="${p.filter}">
-      <div class="imgwrap">
-        <img src="${p.cover}" alt="${title}"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-        <div class="fallback" style="display:none;${fallbackStyle(p.accent)}">${title}</div>
-      </div>
-      <div class="info">
-        <div>
-          <div class="t">${title}</div>
-          <div class="c">${category}</div>
+  /* ── work list (home) ── */
+  const list = $('#work-list');
+  function renderWork() {
+    if (!list) return;
+    list.innerHTML = PROJECTS.map(p => `
+      <a class="proj" href="project.html?slug=${p.slug}" style="--accent:${p.accent};--tab-ink:${inkOn(p.accent)}">
+        <div class="folder">
+          <span class="tab">${pick(p.category)}</span>
+          <div class="sheet"><img src="${p.cover}" alt="" loading="lazy"></div>
         </div>
-        <div class="y">${year}</div>
-      </div>
-    </a>`;
-}
+        <div>
+          <h3>${pick(p.title)}</h3>
+          <p class="meta">${pick(p.role)}, ${yearOf(p)}</p>
+          <p class="sum">${pick(p.summary)}</p>
+          <span class="open">${lang === 'es' ? 'Ver el proyecto' : 'See the project'}</span>
+        </div>
+      </a>`).join('');
+  }
 
-function renderCards(containerId, opts) {
-  const el = document.getElementById(containerId);
-  if (!el) return;
-  const layout = (opts && opts.layout) || 'default';
-  const filter = (opts && opts.filter) || 'all';
-  let list = PROJECTS;
-  if (filter !== 'all') list = list.filter(p => p.filter === filter);
-
-  el.innerHTML = list.map((p, idx) => {
-    if (layout === 'home') {
-      return projectCardHTML(p, idx === 0 ? 'large' : 'small');
-    }
-    return projectCardHTML(p, 'large');
-  }).join('');
-}
-
-/* ---------------- filters (projects.html) ---------------- */
-function initFilters() {
-  const bar = document.querySelector('.filters');
-  if (!bar) return;
-  bar.querySelectorAll('button').forEach(b => {
-    b.addEventListener('click', () => {
-      bar.querySelectorAll('button').forEach(x => x.classList.remove('active'));
-      b.classList.add('active');
-      renderCards('grid', { layout: 'grid', filter: b.dataset.filter });
-    });
-  });
-}
-
-/* ---------------- project detail page ---------------- */
-function initProjectDetail() {
-  const root = document.getElementById('pd-root');
-  if (!root) return;
-  const params = new URLSearchParams(window.location.search);
-  const slug = params.get('slug');
-  const idx = PROJECTS.findIndex(p => p.slug === slug);
-  const p = idx >= 0 ? PROJECTS[idx] : PROJECTS[0];
-  const nextP = PROJECTS[(idx + 1) % PROJECTS.length];
-
-  function render() {
+  /* ── project page ── */
+  const pd = $('#pd');
+  function renderProject() {
+    if (!pd) return;
+    const slug = new URLSearchParams(location.search).get('slug');
+    const i = Math.max(0, PROJECTS.findIndex(p => p.slug === slug));
+    const p = PROJECTS[i], next = PROJECTS[(i + 1) % PROJECTS.length];
     const title = pick(p.title);
-    const year = currentLang === 'es' ? (p.yearEs || p.year) : p.year;
-    document.title = title + ' \u2014 Laureano Lojo';
-
-    document.getElementById('pd-title').textContent = title;
-    document.getElementById('pd-role-v').textContent = pick(p.role);
-    document.getElementById('pd-cat-v').textContent = pick(p.category);
-    document.getElementById('pd-year-v').textContent = year;
-    document.getElementById('pd-cover-img').src = p.cover;
-    document.getElementById('pd-cover-img').alt = title;
-    document.getElementById('pd-desc').textContent = pick(p.description);
-
-    const linkEl = document.getElementById('pd-link');
-    if (p.link) {
-      linkEl.href = p.link;
-      linkEl.style.display = 'inline-flex';
-    } else {
-      linkEl.style.display = 'none';
-    }
-
-    const gal = document.getElementById('pd-gallery');
-    gal.innerHTML = p.gallery.map(src => `
-      <div class="g"><img src="${src}" alt="${title}" loading="lazy"
-        onerror="this.parentElement.style.background='${p.accent}';this.remove();"></div>
-    `).join('');
-
-    document.getElementById('pd-next-name').textContent = pick(nextP.title);
-    document.getElementById('pd-next-link').href = 'project.html?slug=' + nextP.slug;
+    document.title = title + ', Laureano Lojo';
+    pd.style.setProperty('--accent', p.accent);
+    $('#pd-title').textContent = title;
+    $('#pd-role').textContent = pick(p.role);
+    $('#pd-cat').textContent = pick(p.category);
+    $('#pd-year').textContent = yearOf(p);
+    const visit = $('#pd-visit');
+    if (p.link) { visit.hidden = false; visit.href = p.link; visit.textContent = (lang === 'es' ? 'Visitar ' : 'Visit ') + p.link.replace(/^https?:\/\/|\/$/g, ''); } else visit.hidden = true;
+    const cover = $('#pd-cover'); cover.src = p.cover; cover.alt = title;
+    $('#pd-desc').textContent = pick(p.description);
+    $('#pd-gallery').innerHTML = p.gallery.map(src => `<img src="${src}" alt="${title}" loading="lazy">`).join('');
+    $('#pd-next-name').textContent = pick(next.title);
+    $('#pd-next').href = 'project.html?slug=' + next.slug;
   }
 
-  window.__rerender = render;
-  render();
-}
+  rerender = () => { renderWork(); renderProject(); };
 
-/* ---------------- scroll reveal ---------------- */
-function initReveal() {
-  const els = document.querySelectorAll('.reveal');
-  if (!els.length) return;
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('in-view');
-        io.unobserve(entry.target);
+  /* ── the desk ── */
+  const desk = $('#desk');
+  if (desk) {
+    // the printed ruler numbers along the top edge (one per 40px "centimetre")
+    const nums = document.createDocumentFragment();
+    for (let x = 40, n = 1; x < 2600; x += 40, n++) { const s = document.createElement('span'); s.className = 'ruler-n'; s.style.left = x + 'px'; s.textContent = n; nums.appendChild(s); }
+    desk.appendChild(nums);
+
+    const items = $$('.obj', desk).map((el, i) => ({ el, i, x: 0, y: 0, r: 0, vx: 0, vy: 0, vr: 0, w: 0, h: 0, held: false, z: i + 2, pop: 1 }));
+    let W = 0, H = 0, S = 1, mode = '', zTop = items.length + 2, raf = 0;
+
+    function layout() {
+      const rect = desk.getBoundingClientRect(); W = rect.width; H = rect.height;
+      const m = W < 640 ? 'm' : 'd';
+      S = m === 'm' ? Math.max(.48, Math.min(.6, W / 680)) : Math.max(.78, Math.min(1, W / 1380));
+      items.forEach(it => { it.w = it.el.offsetWidth; it.h = it.el.offsetHeight; });
+      if (m !== mode) {            // (re)place everything for this layout
+        mode = m;
+        items.forEach(it => {
+          const [fx, fy, r] = (it.el.dataset[m === 'm' ? 'm' : 'at']).split(',').map(Number);
+          it.x = fx * W + it.w * S / 2; it.y = fy * H + 22 + it.h * S / 2; it.r = r; it.vx = it.vy = it.vr = 0;
+        });
       }
+      items.forEach(clamp); items.forEach(draw);
+    }
+    function clamp(it) {
+      const hw = it.w * S / 2 * .8, hh = it.h * S / 2 * .8;
+      let hit = false;
+      if (it.x < hw) { it.x = hw; it.vx = Math.abs(it.vx) * .45; hit = true; }
+      if (it.x > W - hw) { it.x = W - hw; it.vx = -Math.abs(it.vx) * .45; hit = true; }
+      if (it.y < hh + 18) { it.y = hh + 18; it.vy = Math.abs(it.vy) * .45; hit = true; }
+      if (it.y > H - hh) { it.y = H - hh; it.vy = -Math.abs(it.vy) * .45; hit = true; }
+      if (hit) it.vr += (Math.random() - .5) * 2;
+    }
+    function draw(it) {
+      const s = S * (it.held ? 1.04 : 1) * it.pop;
+      it.el.style.transform = `translate(${it.x - it.w / 2}px, ${it.y - it.h / 2}px) rotate(${it.r}deg) scale(${s})`;
+      it.el.style.zIndex = it.z;
+    }
+    function tick() {
+      let moving = false;
+      items.forEach(it => {
+        if (it.held) return;
+        if (Math.abs(it.vx) + Math.abs(it.vy) + Math.abs(it.vr) < .02) { it.vx = it.vy = it.vr = 0; return; }
+        moving = true;
+        it.x += it.vx; it.y += it.vy; it.r += it.vr;
+        it.vx *= .92; it.vy *= .92; it.vr *= .9;
+        clamp(it); draw(it);
+      });
+      raf = moving ? requestAnimationFrame(tick) : 0;
+    }
+    const kick = () => { if (!raf) raf = requestAnimationFrame(tick); };
+
+    // pick up, drag, toss
+    items.forEach(it => {
+      const el = it.el;
+      let id = null, sx = 0, sy = 0, ox = 0, oy = 0, lx = 0, ly = 0, lt = 0, moved = 0, t0 = 0, gy = 0;
+      el.addEventListener('dragstart', e => e.preventDefault());
+      el.addEventListener('pointerdown', e => {
+        if (e.button) return;
+        id = e.pointerId; el.setPointerCapture(id);
+        const b = desk.getBoundingClientRect();
+        sx = lx = e.clientX; sy = ly = e.clientY; lt = t0 = performance.now(); moved = 0;
+        ox = e.clientX - b.left - it.x; oy = e.clientY - b.top - it.y;
+        gy = oy / (it.h * S / 2 || 1);                  // grabbed above or below the middle
+        it.held = true; it.vx = it.vy = it.vr = 0; it.z = ++zTop; el.classList.add('held');
+        desk.classList.add('touched'); draw(it);
+      });
+      el.addEventListener('pointermove', e => {
+        if (e.pointerId !== id) return;
+        const b = desk.getBoundingClientRect(), now = performance.now(), dt = Math.max(8, now - lt);
+        const dx = e.clientX - lx;
+        it.vx = (e.clientX - lx) / dt * 16; it.vy = (e.clientY - ly) / dt * 16;
+        it.x = e.clientX - b.left - ox; it.y = e.clientY - b.top - oy;
+        it.r += -dx * .06 * gy;                         // objects swing a little as you drag them
+        moved = Math.max(moved, Math.hypot(e.clientX - sx, e.clientY - sy));
+        lx = e.clientX; ly = e.clientY; lt = now;
+        clamp(it); draw(it);
+      });
+      const drop = e => {
+        if (e.pointerId !== id) return;
+        id = null; it.held = false; el.classList.remove('held');
+        if (performance.now() - lt > 80) { it.vx = it.vy = 0; }
+        it.vr = -it.vx * .25 * gy;
+        el.dataset.dragged = moved > 6 ? '1' : '';
+        if (moved <= 6 && el.tagName !== 'A') { it.vr = (Math.random() > .5 ? 1 : -1) * 3; }   // a little wiggle when tapped
+        draw(it); kick();
+      };
+      el.addEventListener('pointerup', drop);
+      el.addEventListener('pointercancel', drop);
+      el.addEventListener('click', e => { if (el.dataset.dragged) { e.preventDefault(); el.dataset.dragged = ''; } });
+      // keyboard: arrows nudge the focused object
+      el.addEventListener('keydown', e => {
+        const k = { ArrowLeft: [-24, 0], ArrowRight: [24, 0], ArrowUp: [0, -24], ArrowDown: [0, 24] }[e.key];
+        if (!k) return; e.preventDefault();
+        it.x += k[0]; it.y += k[1]; it.z = ++zTop; desk.classList.add('touched'); clamp(it); draw(it);
+      });
     });
-  }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
-  els.forEach(el => io.observe(el));
-}
 
-/* ---------------- project card tilt ---------------- */
-function initTilt() {
-  const isTouch = window.matchMedia('(hover: none)').matches;
-  if (isTouch) return;
-  document.addEventListener('mousemove', e => {
-    const card = e.target.closest ? e.target.closest('.pcard') : null;
-    if (!card) return;
-    const r = card.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width - 0.5;
-    const py = (e.clientY - r.top) / r.height - 0.5;
-    card.style.transform = `rotateY(${px * 8}deg) rotateX(${-py * 8}deg)`;
-  });
-  document.addEventListener('mouseout', e => {
-    const card = e.target.closest ? e.target.closest('.pcard') : null;
-    if (card) card.style.transform = '';
-  });
-}
-
-/* ---------------- magnetic buttons ---------------- */
-function initMagnetic() {
-  const isTouch = window.matchMedia('(hover: none)').matches;
-  if (isTouch) return;
-  document.querySelectorAll('.btn').forEach(btn => {
-    btn.addEventListener('mousemove', e => {
-      const r = btn.getBoundingClientRect();
-      const x = e.clientX - r.left - r.width / 2;
-      const y = e.clientY - r.top - r.height / 2;
-      btn.style.transform = `translate(${x * 0.25}px, ${y * 0.35}px)`;
-    });
-    btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
-  });
-}
-
-/* ---------------- boot ---------------- */
-document.addEventListener('DOMContentLoaded', () => {
-  initLangToggle();
-  initCursor();
-  initRotator();
-  initFilters();
-  initProjectDetail();
-  initReveal();
-  initTilt();
-  initMagnetic();
-
-  if (document.getElementById('home-grid')) {
-    window.__rerender = () => { renderCards('home-grid', { layout: 'home' }); syncRotatorLang(); };
-    window.__rerender();
+    // set the desk: things get placed one after another
+    layout();
+    if (!reduce) {
+      items.forEach(it => { it.pop = 1.18; it.el.style.opacity = 0; draw(it); });
+      items.forEach((it, k) => setTimeout(() => {
+        const t1 = performance.now(), r0 = it.r - 8 * (k % 2 ? 1 : -1);
+        it.el.style.opacity = 1;
+        const step = now => {
+          const p = Math.min(1, (now - t1) / 520), e = 1 - Math.pow(1 - p, 3), over = Math.sin(p * Math.PI) * .03;
+          it.pop = 1.18 - .18 * e - over; const r = r0 + (it.r - r0) * e;
+          const keep = it.r; it.r = r; draw(it); it.r = keep;
+          if (p < 1) requestAnimationFrame(step); else { it.pop = 1; draw(it); }
+        };
+        requestAnimationFrame(step);
+      }, 250 + k * 110));
+    }
+    let rt; addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(layout, 120); });
+    document.fonts && document.fonts.ready.then(layout);
   }
-  if (document.getElementById('grid') && !document.getElementById('pd-root')) {
-    window.__rerender = () => {
-      const active = document.querySelector('.filters button.active');
-      renderCards('grid', { layout: 'grid', filter: active ? active.dataset.filter : 'all' });
-    };
-    window.__rerender();
-  }
-});
+
+  applyLang();
+})();

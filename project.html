@@ -1,87 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script>document.documentElement.classList.add("js");</script>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Project — Laureano Lojo</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Project, Laureano Lojo</title>
+<meta name="description" content="Laureano Lojo designs brands, products and the content around them. Brand at Denodo, founder of goodtings. A Coruña, Spain.">
+<meta name="theme-color" content="#2F6B57">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Laureano Lojo — Design">
-<meta property="og:description" content="Graphic designer — brand, product and content. A Coruña, Spain.">
+<meta property="og:title" content="Laureano Lojo, designer">
+<meta property="og:description" content="Brands, products and the content around them. Brand at Denodo, founder of goodtings.">
 <meta property="og:image" content="https://nitolojo.github.io/laureano-portfolio/assets/images/og-image.jpg">
+<meta property="og:url" content="https://nitolojo.github.io/laureano-portfolio/">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://nitolojo.github.io/laureano-portfolio/assets/images/og-image.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,500;12..96,75..100,700&family=Caveat:wght@500;600&family=Instrument+Sans:wght@400;600&display=swap" rel="stylesheet">
 <link rel="icon" type="image/x-icon" href="assets/favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon-16.png">
 <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=2">
 </head>
 <body>
-
-<header>
-  <div class="bar wrap">
-    <a class="wordmark" href="index.html">Laureano Lojo</a>
-    <div class="navwrap">
-      <nav>
-        <a href="projects.html" data-en="Work" data-es="Trabajo">Work</a>
-        <a href="index.html#about" data-en="About" data-es="Sobre mí">About</a>
-        <a href="index.html#contact" data-en="Contact" data-es="Contacto">Contact</a>
-      </nav>
-      <div class="langtoggle">
-        <button data-lang="en" class="active">EN</button>
-        <button data-lang="es">ES</button>
-      </div>
-    </div>
-  </div>
+<header class="wrap top">
+  <a class="name" href="index.html">Laureano Lojo</a>
+  <nav aria-label="main">
+    <a href="index.html#work" data-en="Work" data-es="Trabajo">Work</a>
+    <a href="index.html#about" class="hide-s" data-en="About" data-es="Sobre mí">About</a>
+    <a href="index.html#contact" data-en="Contact" data-es="Contacto">Contact</a>
+    <span class="lang" role="group" aria-label="language">
+      <button type="button" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" data-lang="es" aria-pressed="false">ES</button>
+    </span>
+  </nav>
 </header>
 
-<main class="wrap" id="pd-root">
-  <section class="pd-hero">
-    <a class="pd-back" href="projects.html">← <span data-en="All work" data-es="Todo el trabajo">All work</span></a>
-    <h1 class="pd-title" id="pd-title">—</h1>
-    <div class="pd-meta">
-      <div><span class="k" data-en="Role" data-es="Rol">Role</span><span class="v" id="pd-role-v"></span></div>
-      <div><span class="k" data-en="Category" data-es="Categoría">Category</span><span class="v" id="pd-cat-v"></span></div>
-      <div><span class="k" data-en="Year" data-es="Año">Year</span><span class="v" id="pd-year-v"></span></div>
+<main id="pd">
+  <div class="wrap pd-head">
+    <a class="back" href="index.html#work" data-en="All work" data-es="Todo el trabajo">All work</a>
+    <h1 id="pd-title">&nbsp;</h1>
+    <dl class="pd-meta">
+      <div><dt data-en="Role" data-es="Rol">Role</dt><dd id="pd-role"></dd></div>
+      <div><dt data-en="Focus" data-es="Enfoque">Focus</dt><dd id="pd-cat"></dd></div>
+      <div><dt data-en="When" data-es="Cuándo">When</dt><dd id="pd-year"></dd></div>
+    </dl>
+    <a class="visit" id="pd-visit" target="_blank" rel="noopener" hidden></a>
+  </div>
+  <div class="wrap"><div class="pd-cover"><img id="pd-cover" src="" alt=""></div></div>
+  <div class="wrap pd-desc"><p id="pd-desc"></p></div>
+  <div class="wrap">
+    <div class="gallery" id="pd-gallery"></div>
+    <a class="next" id="pd-next" href="#"><span data-en="Next project" data-es="Siguiente proyecto">Next project</span><b id="pd-next-name">&nbsp;</b></a>
+  </div>
+  <section id="contact" class="wrap contact">
+    <div class="note">
+      <h2 data-en="Say hola." data-es="Di hola.">Say hola.</h2>
+      <div class="mail">
+        <a href="mailto:laureanolojo@icloud.com">laureanolojo@icloud.com</a>
+        <button type="button" class="copy" data-copy="laureanolojo@icloud.com" data-en="Copy email" data-es="Copiar email">Copy email</button>
+      </div>
     </div>
-    <a id="pd-link" class="btn btn-outline" href="#" target="_blank" rel="noopener" style="margin-top:24px;display:none;">
-      <span data-en="Visit site" data-es="Ver sitio">Visit site</span> ↗
-    </a>
-    <div class="pd-cover"><img id="pd-cover-img" src="" alt=""></div>
   </section>
-
-  <section class="pd-body reveal">
-    <p id="pd-desc"></p>
-  </section>
-
-  <section class="pd-gallery reveal" id="pd-gallery"></section>
-
-  <a class="pd-next" id="pd-next-link" href="#">
-    <div>
-      <div class="label" data-en="Next project" data-es="Siguiente proyecto">Next project</div>
-      <div class="name" id="pd-next-name">—</div>
-    </div>
-    <div>↗</div>
-  </a>
 </main>
 
-<footer class="wrap" id="contact">
-  <div class="big"><span data-en="Let's talk —" data-es="Hablemos —">Let's talk —</span> <a href="mailto:laureanolojo@icloud.com">laureanolojo@icloud.com</a></div>
-  <div class="foot-row">
-    <span>© 2026 Laureano Lojo</span>
-    <div class="socials">
-      <a href="https://instagram.com/laureanolojo" target="_blank" rel="noopener">Instagram</a>
-      <a href="https://tiktok.com/@laureanolojo" target="_blank" rel="noopener">TikTok</a>
-      <a href="https://www.linkedin.com/in/laureano-lojo-a14077158/" target="_blank" rel="noopener">LinkedIn</a>
-    </div>
-  </div>
+<footer class="wrap foot">
+  <span>© 2026 Laureano Lojo</span>
+  <nav aria-label="social">
+    <a href="https://www.linkedin.com/in/laureano-lojo-a14077158/" target="_blank" rel="noopener">LinkedIn</a>
+    <a href="https://instagram.com/laureanolojo" target="_blank" rel="noopener">Instagram</a>
+    <a href="https://tiktok.com/@laureanolojo" target="_blank" rel="noopener">TikTok</a>
+    <a href="https://goodtings.app/" target="_blank" rel="noopener">goodtings.app</a>
+  </nav>
 </footer>
 
-<script src="assets/data.js"></script>
-<script src="assets/main.js"></script>
+<script src="assets/data.js?v=2"></script>
+<script src="assets/main.js?v=2"></script>
 </body>
 </html>
