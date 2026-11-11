@@ -70,10 +70,34 @@
     const visit = $('#pd-visit');
     if (p.link) { visit.hidden = false; visit.href = p.link; visit.textContent = (lang === 'es' ? 'Visitar ' : 'Visit ') + p.link.replace(/^https?:\/\/|\/$/g, ''); } else visit.hidden = true;
     const cover = $('#pd-cover'); cover.src = p.cover; cover.alt = title;
-    $('#pd-desc').textContent = pick(p.description);
-    $('#pd-gallery').innerHTML = p.gallery.map(src => `<img src="${src}" alt="${title}" loading="lazy">`).join('');
+    $('#pd-desc').textContent = pick(p.story ? p.summary : p.description);
+    const gal = $('#pd-gallery');
+    if (p.story) { gal.className = 'story'; gal.innerHTML = p.story.map(storyBlock).join(''); }
+    else { gal.className = 'gallery'; gal.innerHTML = p.gallery.map(src => `<img src="${src}" alt="${title}" loading="lazy">`).join(''); }
     $('#pd-next-name').textContent = pick(next.title);
     $('#pd-next').href = 'project.html?slug=' + next.slug;
+  }
+
+
+  /* ── case-study blocks (used when a project has a story) ── */
+  const head = b => `<div class="blk-text"><h2>${pick(b.title)}</h2><p>${pick(b.text)}</p></div>`;
+  const CHIPS = [['#4AED80', { en: 'every day', es: 'cada día' }, '#000'], ['#8B5CF6', { en: 'BIG tings', es: 'BIG tings' }, '#fff']];
+  function storyBlock(b) {
+    if (b.type === 'split') return `<div class="blk blk-split">${head(b)}<img src="${b.img}" alt="${b.alt || ''}" loading="lazy"></div>`;
+    if (b.type === 'wide') return `<div class="blk blk-wide${b.tall ? ' tall' : ''}">${head(b)}<img src="${b.img}" alt="${b.alt || ''}" loading="lazy"></div>`;
+    if (b.type === 'glasses') return `<div class="blk blk-glasses">${head(b)}
+        <div class="lenses">
+          <img src="${b.imgs[0]}" alt="" loading="lazy">
+          <video src="${b.video}" poster="${b.poster}" autoplay muted loop playsinline preload="metadata" aria-label="${lang === 'es' ? 'goodtings. en las gafas, vídeo' : 'goodtings. on the glasses, video'}"></video>
+          <img src="${b.imgs[1]}" alt="" loading="lazy">
+        </div></div>`;
+    if (b.type === 'brand') return `<div class="blk blk-brand">${head(b)}
+        <div class="kit">
+          <div class="k-mark"><img src="assets/images/projects/goodtings/wordmark-white.svg" alt="goodtings. wordmark"></div>
+          <div class="k-type"><b>Aa</b><span>Figtree</span><span class="k-sample">collect the good.<br>build your year.</span></div>
+          ${CHIPS.map(([c, n, ink]) => `<div class="k-chip" style="background:${c};color:${ink}"><span>${pick(n)}</span><span>${c}</span></div>`).join('')}
+        </div></div>`;
+    return '';
   }
 
   rerender = () => { renderWork(); renderProject(); };
