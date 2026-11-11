@@ -39,26 +39,21 @@
   function renderWork() {
     if (!list) return;
     const n = PROJECTS.length;
-    list.innerHTML = PROJECTS.map((p, i) => {
-      const papers = [p.cover, ...(p.gallery || []).filter(g => g !== p.cover)].slice(0, 3);
-      return `
+    list.innerHTML = PROJECTS.map((p, i) => `
       <a class="folder" href="project.html?slug=${p.slug}" style="--accent:${p.accent};--f-ink:${inkOn(p.accent)};--tabx:${(i / n * 100).toFixed(2)}%">
         <span class="f-tab">${pick(p.title)}<em>${yearOf(p)}</em></span>
-        <span class="f-body">
-          <span class="f-papers">
-            ${papers.slice(1).reverse().map((src, k) => `<img class="p${papers.length - k}" src="${src}" alt="" loading="lazy">`).join('')}
-            <img class="p1" src="${papers[0]}" alt="" loading="lazy">
-            <span class="f-pocket"><span class="f-label">${pick(p.category)}</span></span>
-          </span>
-          <span class="f-text">
+        <span class="f-back">
+          <span class="f-sheet"><img src="${p.cover}" alt="" loading="lazy"></span>
+          <span class="f-front">
             <h3>${pick(p.title)}</h3>
-            <span class="meta">${pick(p.role)}</span>
-            <span class="sum">${pick(p.summary)}</span>
-            <span class="f-open">${lang === 'es' ? 'Abrir la carpeta' : 'Open the folder'}</span>
+            <span class="f-info">
+              <span class="meta">${pick(p.role)}</span>
+              <span class="sum">${pick(p.summary)}</span>
+              <span class="f-open"><i></i>${lang === 'es' ? 'Abrir la carpeta' : 'Open the folder'}</span>
+            </span>
           </span>
         </span>
-      </a>`;
-    }).join('');
+      </a>`).join('');
     stack();
   }
 
@@ -72,8 +67,8 @@
       const top = parseFloat(getComputedStyle(f).top) || 0;
       const h = f.offsetHeight;
       const k = Math.max(0, Math.min(1, 1 - (next.getBoundingClientRect().top - top) / h));
-      f.style.transform = k ? `scale(${1 - k * .05})` : '';
-      f.style.filter = k ? `brightness(${1 - k * .22})` : '';
+      f.style.transform = k ? `scale(${1 - k * .035})` : '';
+      f.style.filter = k ? `brightness(${1 - k * .08})` : '';
     });
   }
   if (list) addEventListener('scroll', () => requestAnimationFrame(stack), { passive: true });

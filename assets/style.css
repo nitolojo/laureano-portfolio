@@ -91,7 +91,7 @@ button { font: inherit; color: inherit; }
 .badge .clip { width: 46px; height: 64px; margin: 0 auto -14px; border-radius: 10px 10px 4px 4px; background: linear-gradient(#cfd2d6, #9aa0a6); position: relative; z-index: 1; }
 .badge .clip::after { content: ''; position: absolute; left: 13px; right: 13px; top: 46px; height: 7px; border-radius: 4px; background: #5c6268; }
 .badge .card { background: #fff; border-radius: 14px; overflow: hidden; padding-bottom: 16px; }
-.badge .band { background: #E30613; color: #fff; padding: 18px 16px 14px; }
+.badge .band { background: #F05149; color: #fff; padding: 18px 16px 14px; }
 .badge .band b { display: block; font-family: var(--text); font-weight: 700; font-size: 20px; letter-spacing: -.01em; }
 .badge .band span { font-size: 12px; opacity: .9; }
 .badge .who { padding: 16px 16px 0; }
@@ -119,61 +119,50 @@ button { font: inherit; color: inherit; }
 section { padding-block: clamp(72px, 10vw, 140px); }
 .sec-h { font-family: var(--display); font-weight: 700; font-size: clamp(36px, 5vw, 64px); line-height: 1; letter-spacing: -.03em; margin: 0 0 clamp(32px, 5vw, 64px); }
 
-/* work: a drawer of folders. they stack as you scroll; their tabs stay visible like an index. */
+/* work: a drawer of folders. they stack as you scroll and their coloured tabs stay visible, like an index. */
 .work-list { position: relative; }
 .folder {
-  position: sticky; top: 76px; display: block; padding-top: 50px; text-decoration: none; color: var(--f-ink);
-  margin-bottom: 16vh; transform-origin: 50% 0; will-change: transform;
+  position: sticky; top: 76px; display: block; padding-top: 46px; margin-bottom: 18vh;
+  text-decoration: none; color: var(--ink); transform-origin: 50% 0; will-change: transform;
 }
 .folder:last-child { margin-bottom: 0; }
 .f-tab {
-  position: absolute; top: 0; left: var(--tabx); width: min(32%, 340px); height: 52px; padding: 13px 22px 0;
+  position: absolute; top: 0; left: var(--tabx); width: min(30%, 320px); height: 50px; padding: 12px 20px 0;
   display: flex; justify-content: space-between; align-items: baseline; gap: 12px;
-  background: var(--accent); border-radius: 16px 16px 0 0;
-  font-family: var(--display); font-weight: 600; font-size: 19px; letter-spacing: -.01em;
+  background: var(--accent); color: var(--f-ink); border-radius: 14px 14px 0 0;
+  font-family: var(--display); font-weight: 600; font-size: 18px; letter-spacing: -.01em;
 }
-.f-tab em { font-style: normal; font-family: var(--text); font-weight: 400; font-size: 13px; opacity: .75; }
-.f-body {
-  position: relative; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
-  height: clamp(500px, 70vh, 660px); border-radius: 22px; background: var(--accent); overflow: hidden;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 -14px 40px rgba(0,0,0,.10);
+.f-tab em { font-style: normal; font-family: var(--text); font-weight: 400; font-size: 13px; opacity: .8; }
+.f-back {
+  position: relative; display: block; height: clamp(520px, 72vh, 660px);
+  background: #F1F1EF; border-radius: 22px; border-top: 4px solid var(--accent); overflow: hidden;
+  box-shadow: 0 -10px 30px rgba(0,0,0,.06);
 }
-.folder:first-child .f-body { box-shadow: inset 0 1px 0 rgba(255,255,255,.35); }
-/* the papers inside, and the pocket that holds them */
-.f-papers { position: relative; }
-.f-papers img {
-  position: absolute; left: 9%; top: 11%; width: 78%; aspect-ratio: 4 / 3; object-fit: cover;
-  border: 8px solid #fff; border-radius: 6px; background: #eee;
-  box-shadow: 0 2px 3px rgba(0,0,0,.12), 0 18px 34px rgba(0,0,0,.2);
-  transition: transform .6s var(--ease);
+.folder:first-child .f-back { box-shadow: none; }
+.f-sheet {
+  position: absolute; left: 7%; right: 7%; top: 6%; aspect-ratio: 16 / 10; border-radius: 14px; overflow: hidden; background: #fff;
+  box-shadow: 0 1px 2px rgba(0,0,0,.08), 0 18px 40px rgba(0,0,0,.12);
+  transition: transform .7s var(--ease);
 }
-.f-papers .p3 { transform: translate(-6%, 6%) rotate(-7deg); }
-.f-papers .p2 { transform: translate(9%, -3%) rotate(5deg); }
-.f-papers .p1 { transform: rotate(-1.5deg); }
-.folder:hover .p1, .folder:focus-visible .p1 { transform: translate(0, -7%) rotate(-1deg); }
-.folder:hover .p2, .folder:focus-visible .p2 { transform: translate(13%, -9%) rotate(8deg); }
-.folder:hover .p3, .folder:focus-visible .p3 { transform: translate(-13%, -3%) rotate(-11deg); }
-.f-pocket {
-  position: absolute; left: 0; right: 0; bottom: 0; height: 30%;
-  background: var(--accent); border-radius: 18px 18px 0 0;
-  box-shadow: 0 -1px 0 rgba(0,0,0,.08), inset 0 1px 0 rgba(255,255,255,.4), 0 -18px 30px rgba(0,0,0,.12);
+.f-sheet img { width: 100%; height: 100%; object-fit: cover; }
+.folder:hover .f-sheet, .folder:focus-visible .f-sheet { transform: translateY(-14px); }
+.f-front {
+  position: absolute; left: 0; right: 0; bottom: 0; height: 44%;
+  display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 64px); align-items: end;
+  padding: clamp(24px, 3.4vw, 48px); background: #fff; border-radius: 22px;
+  box-shadow: 0 -1px 0 rgba(0,0,0,.05), 0 -24px 48px rgba(0,0,0,.08);
 }
-.f-label {
-  position: absolute; left: 9%; top: 26%; padding: 8px 16px 6px; background: #fff; color: #000; border-radius: 3px;
-  font-family: var(--hand); font-size: 26px; line-height: 1; transform: rotate(-2deg);
-  box-shadow: 0 1px 2px rgba(0,0,0,.15);
-}
-.f-text { display: flex; flex-direction: column; justify-content: flex-end; padding: clamp(24px, 4vw, 56px); padding-left: 0; }
-.f-text h3 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(44px, 6vw, 96px); line-height: .92; letter-spacing: -.04em; }
-.f-text .meta { margin: 16px 0 0; font-size: 15px; opacity: .78; }
-.f-text .sum { margin: 14px 0 0; max-width: 36ch; font-size: 17px; }
+.f-front h3 { margin: 0; font-family: var(--display); font-weight: 600; font-size: clamp(44px, 6vw, 92px); line-height: .92; letter-spacing: -.04em; }
+.f-info { display: block; max-width: 40ch; }
+.f-info .meta { display: block; color: var(--graphite); font-size: 15px; }
+.f-info .sum { display: block; margin-top: 10px; font-size: 17px; }
 .f-open {
-  align-self: flex-start; margin-top: 26px; padding: 12px 20px; border-radius: 999px;
-  background: var(--f-ink); color: var(--accent); font-weight: 600; font-size: 15px;
-  transition: transform .3s var(--ease);
+  display: inline-flex; align-items: center; gap: 10px; margin-top: 22px; padding: 10px 18px 10px 14px; border-radius: 999px;
+  border: 1.5px solid var(--ink); font-weight: 600; font-size: 15px; transition: background .25s, color .25s;
 }
-.folder:hover .f-open { transform: translateX(4px); }
-@media (prefers-reduced-motion: reduce) { .f-papers img, .f-open { transition: none; } }
+.f-open i { width: 10px; height: 10px; border-radius: 50%; background: var(--accent); }
+.folder:hover .f-open, .folder:focus-visible .f-open { background: var(--ink); color: #fff; }
+@media (prefers-reduced-motion: reduce) { .f-sheet { transition: none; } }
 
 /* about */
 .about { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: clamp(32px, 5vw, 80px); }
@@ -252,12 +241,12 @@ section { padding-block: clamp(72px, 10vw, 140px); }
 /* ── responsive ── */
 @media (max-width: 860px) {
   .about, .blk-split, .blk-wide .blk-text { grid-template-columns: 1fr; }
-  .f-body { grid-template-columns: 1fr; grid-template-rows: 1fr auto; height: auto; min-height: 0; }
-  .f-papers { height: 300px; }
-  .f-text { padding: 8px 24px 28px; }
-  .f-tab { width: 34%; padding: 13px 14px 0; font-size: 16px; }
+  .f-back { height: auto; padding: 18px 14px 0; }
+  .f-sheet { position: relative; left: auto; right: auto; top: auto; display: block; }
+  .f-front { position: relative; height: auto; margin: -36px -14px 0; grid-template-columns: 1fr; gap: 14px; padding: 24px 22px 26px; }
+  .folder { top: 68px; margin-bottom: 10vh; }
+  .f-tab { width: 33.33%; padding: 13px 14px 0; font-size: 15px; height: 46px; }
   .f-tab em { display: none; }
-  .f-label { font-size: 22px; }
   .lenses { grid-template-columns: 1fr 1fr; }
   .lenses video { grid-column: 1 / -1; grid-row: 1; width: min(100%, 340px); justify-self: center; }
   .kit { grid-template-columns: repeat(2, minmax(0, 1fr)); }

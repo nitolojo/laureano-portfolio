@@ -4,7 +4,7 @@
 const PROJECTS = [
   {
     slug: 'denodo',
-    accent: '#E30613',
+    accent: '#F05149',
     year: '2021—Now',
     yearEs: '2021—Hoy',
     filter: 'brand',
